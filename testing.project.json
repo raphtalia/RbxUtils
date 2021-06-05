@@ -1,0 +1,14 @@
+{
+    "name": "RbxUtils - Testing",
+    "tree": {
+        "$className": "DataModel",
+
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+
+            "RbxUtils": {
+                "$path": "src"
+            }
+        }
+    }
+}

@@ -1,0 +1,4 @@
+std="roblox"
+
+[config]
+shadowing = { ignore_pattern = "^(_|self)" }
