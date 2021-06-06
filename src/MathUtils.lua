@@ -13,11 +13,11 @@ function MathUtils.round(x: number, accuracy: number): number
     return math.round(x / accuracy) * accuracy
 end
 
-function MathUtils.roundCeil(x: number, accuracy: number): number
+function MathUtils.ceil(x: number, accuracy: number): number
     return math.ceil(x / accuracy) * accuracy
 end
 
-function MathUtils.roundFloor(x: number, accuracy: number): number
+function MathUtils.floor(x: number, accuracy: number): number
     return math.floor(x / accuracy) * accuracy
 end
 
