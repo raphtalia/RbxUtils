@@ -1,5 +1,7 @@
 return {
     CFrame = require(script.CFrameUtils),
+    Color = require(script.ColorUtils),
+    JSON = require(script.JSONUtils),
     Math = require(script.MathUtils),
     Part = require(script.PartUtils),
     Raycast = require(script.RaycastUtils),
