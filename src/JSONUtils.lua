@@ -11,7 +11,7 @@ local function serializeTypes(data, typeMarker)
         local type = typeof(v)
 
         if type == "table" then
-            data[i] = serializeTypes(v)
+            data[i] = serializeTypes(v, typeMarker)
         elseif type == "Vector2" then
             data[i] = {
                 typeMarker,
@@ -50,14 +50,14 @@ local function serializeTypes(data, typeMarker)
             data[i] = {
                 typeMarker,
                 6,
-                JSON.serialize(v.Keypoints),
+                serializeTypes(v.Keypoints, typeMarker),
             }
         elseif type == "ColorSequenceKeypoint" then
             data[i] = {
                 typeMarker,
                 7,
                 v.Time,
-                Colors.color3ToHex(v.Value),
+                Colors.color3ToHex(v.Value, typeMarker),
             }
         elseif type == "NumberRange" then
             data[i] = {
@@ -70,7 +70,7 @@ local function serializeTypes(data, typeMarker)
             data[i] = {
                 typeMarker,
                 9,
-                JSON.serialize(v.Keypoints),
+                serializeTypes(v.Keypoints, typeMarker),
             }
         elseif type == "NumberSequenceKeypoint" then
             -- This could be optimized to ignore envlope if it is 0
@@ -105,38 +105,40 @@ end
 
 local function deserializeTypes(data, typeMarker)
     for i,v in pairs(data) do
-        if type(v) == "table" and v[1] == typeMarker then
-            local type = v[2]
-            v = {select(3, unpack(v))}
-            v = #v == 1 and v[1] or v
+        if type(v) == "table" then
+            if v[1] == typeMarker then
+                local type = v[2]
+                v = {select(3, unpack(v))}
+                v = #v == 1 and v[1] or v
 
-            if type == 1 then -- Vector2
-                data[i] = Vector2.new(v[1], v[2])
-            elseif type == 2 then -- Vector3
-                data[i] = Vector3.new(v[1], v[2], v[3])
-            elseif type == 3 then -- CFrame
-                data[i] = CFrame.new(v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12])
-            elseif type == 4 then -- Color3
-                data[i] = Colors.color3FromHex(v)
-            elseif type == 5 then -- BrickColor
-                data[i] = BrickColor.new(v)
-            elseif type == 6 then -- ColorSequence
-                data[i] = ColorSequence.new(JSON.deserialize(v))
-            elseif type == 7 then -- ColorSequenceKeypoint
-                data[i] = ColorSequenceKeypoint.new(v[1], Colors.color3FromHex(v[2]))
-            elseif type == 8 then -- NumberRange
-                data[i] = NumberRange.new(v[1], v[2])
-            elseif type == 9 then -- NumberSequence
-                data[i] = NumberSequence.new(JSON.deserialize(v))
-            elseif type == 10 then -- NumberSequenceKeypoint
-                data[i] = NumberSequenceKeypoint.new(v[1], v[2], v[3])
-            elseif type == 11 then -- UDim
-                data[i] = UDim.new(v[1], v[2])
-            elseif type == 12 then -- UDim2
-                data[i] = UDim2.new(v[1], v[2], v[3], v[4])
+                if type == 1 then -- Vector2
+                    data[i] = Vector2.new(v[1], v[2])
+                elseif type == 2 then -- Vector3
+                    data[i] = Vector3.new(v[1], v[2], v[3])
+                elseif type == 3 then -- CFrame
+                    data[i] = CFrame.new(v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12])
+                elseif type == 4 then -- Color3
+                    data[i] = Colors.color3FromHex(v)
+                elseif type == 5 then -- BrickColor
+                    data[i] = BrickColor.new(v)
+                elseif type == 6 then -- ColorSequence
+                    data[i] = ColorSequence.new(deserializeTypes(v, typeMarker))
+                elseif type == 7 then -- ColorSequenceKeypoint
+                    data[i] = ColorSequenceKeypoint.new(v[1], Colors.color3FromHex(v[2]))
+                elseif type == 8 then -- NumberRange
+                    data[i] = NumberRange.new(v[1], v[2])
+                elseif type == 9 then -- NumberSequence
+                    data[i] = NumberSequence.new(deserializeTypes(v, typeMarker))
+                elseif type == 10 then -- NumberSequenceKeypoint
+                    data[i] = NumberSequenceKeypoint.new(v[1], v[2], v[3])
+                elseif type == 11 then -- UDim
+                    data[i] = UDim.new(v[1], v[2])
+                elseif type == 12 then -- UDim2
+                    data[i] = UDim2.new(v[1], v[2], v[3], v[4])
+                end
+            else
+                data[i] = deserializeTypes(v, typeMarker)
             end
-        else
-            data[i] = JSON.deserialize(v)
         end
     end
 
