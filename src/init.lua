@@ -1,4 +1,5 @@
 return {
+    Codecs = require(script.Codecs),
     CFrame = require(script.CFrameUtils),
     Color = require(script.ColorUtils),
     JSON = require(script.JSONUtils),
