@@ -84,7 +84,6 @@ function compress(uncompressed)
 
 	-- make histogram
 	local hist = {}
-	local n = 0
 	-- dont have to use all datat to make the histogram
 	local uncompressed_size = string_len(uncompressed)
 	local c;
