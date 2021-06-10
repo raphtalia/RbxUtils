@@ -7,7 +7,7 @@
             "$className": "ReplicatedStorage",
 
             "RbxUtils": {
-                "$path": "src"
+                "$path": "."
             }
         }
     }
