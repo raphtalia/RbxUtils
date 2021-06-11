@@ -7,6 +7,8 @@ local Colors = require(script.Parent.ColorUtils)
 local JSON = {}
 
 function JSON.serializeTypes(data, typeMarker)
+    typeMarker = typeMarker or TYPE_MARKER
+
     for i,v in pairs(data) do
         local type = typeof(v)
 
@@ -111,6 +113,8 @@ function JSON.serializeTypes(data, typeMarker)
 end
 
 function JSON.deserializeTypes(data, typeMarker)
+    typeMarker = typeMarker or TYPE_MARKER
+
     for i,v in pairs(data) do
         if type(v) == "table" then
             if v[1] == typeMarker then
