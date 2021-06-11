@@ -6,12 +6,12 @@ local Colors = require(script.Parent.ColorUtils)
 
 local JSON = {}
 
-local function serializeTypes(data, typeMarker)
+function JSON.serializeTypes(data, typeMarker)
     for i,v in pairs(data) do
         local type = typeof(v)
 
         if type == "table" then
-            data[i] = serializeTypes(v, typeMarker)
+            data[i] = JSON.serializeTypes(v, typeMarker)
         elseif type == "Vector2" then
             data[i] = {
                 typeMarker,
@@ -50,7 +50,7 @@ local function serializeTypes(data, typeMarker)
             data[i] = {
                 typeMarker,
                 6,
-                serializeTypes(v.Keypoints, typeMarker),
+                JSON.serializeTypes(v.Keypoints, typeMarker),
             }
         elseif type == "ColorSequenceKeypoint" then
             data[i] = {
@@ -70,7 +70,7 @@ local function serializeTypes(data, typeMarker)
             data[i] = {
                 typeMarker,
                 9,
-                serializeTypes(v.Keypoints, typeMarker),
+                JSON.serializeTypes(v.Keypoints, typeMarker),
             }
         elseif type == "NumberSequenceKeypoint" then
             -- This could be optimized to ignore envlope if it is 0
@@ -97,13 +97,20 @@ local function serializeTypes(data, typeMarker)
                 v.Y.Scale,
                 v.Y.Offset,
             }
+        elseif type == "EnumItem" then
+            data[i] = {
+                typeMarker,
+                13,
+                tostring(v.EnumType),
+                v.Name,
+            }
         end
     end
 
     return data
 end
 
-local function deserializeTypes(data, typeMarker)
+function JSON.deserializeTypes(data, typeMarker)
     for i,v in pairs(data) do
         if type(v) == "table" then
             if v[1] == typeMarker then
@@ -122,22 +129,24 @@ local function deserializeTypes(data, typeMarker)
                 elseif type == 5 then -- BrickColor
                     data[i] = BrickColor.new(v)
                 elseif type == 6 then -- ColorSequence
-                    data[i] = ColorSequence.new(deserializeTypes(v, typeMarker))
+                    data[i] = ColorSequence.new(JSON.deserializeTypes(v, typeMarker))
                 elseif type == 7 then -- ColorSequenceKeypoint
                     data[i] = ColorSequenceKeypoint.new(v[1], Colors.color3FromHex(v[2]))
                 elseif type == 8 then -- NumberRange
                     data[i] = NumberRange.new(v[1], v[2])
                 elseif type == 9 then -- NumberSequence
-                    data[i] = NumberSequence.new(deserializeTypes(v, typeMarker))
+                    data[i] = NumberSequence.new(JSON.deserializeTypes(v, typeMarker))
                 elseif type == 10 then -- NumberSequenceKeypoint
                     data[i] = NumberSequenceKeypoint.new(v[1], v[2], v[3])
                 elseif type == 11 then -- UDim
                     data[i] = UDim.new(v[1], v[2])
                 elseif type == 12 then -- UDim2
                     data[i] = UDim2.new(v[1], v[2], v[3], v[4])
+                elseif type == 13 then
+                    data[i] = Enum[v[1]][v[2]]
                 end
             else
-                data[i] = deserializeTypes(v, typeMarker)
+                data[i] = JSON.deserializeTypes(v, typeMarker)
             end
         end
     end
@@ -147,7 +156,7 @@ end
 
 function JSON.serialize(data, typeMarker)
     return HttpService:JSONEncode(
-        serializeTypes(
+        JSON.serializeTypes(
             data,
             typeMarker or TYPE_MARKER
         )
@@ -155,7 +164,7 @@ function JSON.serialize(data, typeMarker)
 end
 
 function JSON.deserialize(data, typeMarker)
-    return deserializeTypes(
+    return JSON.deserializeTypes(
         HttpService:JSONDecode(data),
         typeMarker or TYPE_MARKER
     )
