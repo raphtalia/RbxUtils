@@ -2,7 +2,21 @@ local TYPE_MARKER = "_T"
 
 local HttpService = game:GetService("HttpService")
 
-local Colors = require(script.Parent.ColorUtils)
+local function color3ToHex(color3)
+    return ("%02X%02X%02X"):format(
+        math.round(color3.R * 255),
+        math.round(color3.G * 255),
+        math.round(color3.B * 255)
+    )
+end
+
+local function hexToColor3(hex)
+    return Color3.fromRGB(
+        tonumber(hex:sub(1, 2), 16),
+        tonumber(hex:sub(3, 4), 16),
+        tonumber(hex:sub(5, 6), 16)
+    )
+end
 
 local JSON = {}
 
@@ -40,7 +54,7 @@ function JSON.serializeTypes(data, typeMarker)
             data[i] = {
                 typeMarker,
                 4,
-                Colors.color3ToHex(v),
+                color3ToHex(v),
             }
         elseif type == "BrickColor" then
             data[i] = {
@@ -59,7 +73,7 @@ function JSON.serializeTypes(data, typeMarker)
                 typeMarker,
                 7,
                 v.Time,
-                Colors.color3ToHex(v.Value, typeMarker),
+                color3ToHex(v.Value),
             }
         elseif type == "NumberRange" then
             data[i] = {
@@ -129,13 +143,13 @@ function JSON.deserializeTypes(data, typeMarker)
                 elseif type == 3 then -- CFrame
                     data[i] = CFrame.new(v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12])
                 elseif type == 4 then -- Color3
-                    data[i] = Colors.color3FromHex(v)
+                    data[i] = hexToColor3(v)
                 elseif type == 5 then -- BrickColor
                     data[i] = BrickColor.new(v)
                 elseif type == 6 then -- ColorSequence
                     data[i] = ColorSequence.new(JSON.deserializeTypes(v, typeMarker))
                 elseif type == 7 then -- ColorSequenceKeypoint
-                    data[i] = ColorSequenceKeypoint.new(v[1], Colors.color3FromHex(v[2]))
+                    data[i] = ColorSequenceKeypoint.new(v[1], hexToColor3(v[2]))
                 elseif type == 8 then -- NumberRange
                     data[i] = NumberRange.new(v[1], v[2])
                 elseif type == 9 then -- NumberSequence
