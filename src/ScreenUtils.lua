@@ -5,9 +5,9 @@ local RaycastUtils = require(script.Parent.RaycastUtils)
 local ScreenUtils = {}
 
 function ScreenUtils.getTargetAtPosition(x: number, y: number, depth: number?, raycastParams: RaycastParams?): RaycastResult?
-    local ray = workspace.CurrentCamera:ViewportPointToRay(x, y, depth or 500)
+    local ray = workspace.CurrentCamera:ViewportPointToRay(x, y)
 
-    local result = RaycastUtils.cast(ray.Origin, ray.Direction, raycastParams)
+    local result = RaycastUtils.cast(ray.Origin, ray.Direction * (depth or 500), raycastParams)
     if result then
         return result
     end
