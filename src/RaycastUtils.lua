@@ -9,6 +9,10 @@ local DEFAULT_PARAMS = RaycastParams.new()
 
 local RaycastUtils = {}
 
+local function filterCollideOnly(instance)
+    return instance.CanCollide
+end
+
 function RaycastUtils.make(params: RaycastParamsTable): RaycastParams
     local raycastParams = RaycastParams.new()
 
@@ -40,8 +44,8 @@ function RaycastUtils.cast(origin: Vector3, dir: Vector3, params: RaycastParams?
     return workspace:Raycast(origin, dir, params or DEFAULT_PARAMS)
 end
 
--- Cast ignores parts that are CanCollide Off
-function RaycastUtils.castCollideOnly(origin: Vector3, dir: Vector3, params: RaycastParams?): RaycastResult
+-- Returns instance that meets filter requirement
+function RaycastUtils.castWithFilter(origin: Vector3, dir: Vector3, filter: any, params: RaycastParams?): RaycastResult
     params = params or DEFAULT_PARAMS
     local originalFilter = params.FilterDescendantsInstances
     local tempFilter = params.FilterDescendantsInstances
@@ -49,7 +53,7 @@ function RaycastUtils.castCollideOnly(origin: Vector3, dir: Vector3, params: Ray
     repeat
         local result = workspace:Raycast(origin, dir, params)
         if result then
-            if result.Instance.CanCollide then
+            if filter(result.Instance) then
                 params.FilterDescendantsInstances = originalFilter
                 return result
             else
@@ -63,6 +67,16 @@ function RaycastUtils.castCollideOnly(origin: Vector3, dir: Vector3, params: Ray
             return nil
         end
     until not result
+end
+
+-- Cast ignores parts that are CanCollide Off
+function RaycastUtils.castCollideOnly(origin: Vector3, dir: Vector3, params: RaycastParams?): RaycastResult
+    return RaycastUtils.castWithFilter(
+        origin,
+        dir,
+        filterCollideOnly,
+        params
+    )
 end
 
 return RaycastUtils
