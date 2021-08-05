@@ -8,5 +8,6 @@ return {
     Raycast = require(script.RaycastUtils),
     Screen = require(script.ScreenUtils),
     Table = require(script.TableUtils),
+    Terrain = require(script.TerrainUtils),
     Vector3 = require(script.Vector3Utils),
 }
