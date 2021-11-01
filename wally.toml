@@ -1,0 +1,9 @@
+[package]
+name = "raphtalia/rbxutils"
+description = "Library with general purpose utility functions"
+version = "1.0.0"
+license = "MIT"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
